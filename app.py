@@ -192,12 +192,15 @@ def risk_profile(wb):
     if wb < 1.4:   return "Aggressive Growth",     "#DD6B20"
     return         "High Risk / Speculative",       "#E53E3E"
 
-PLOT_BASE = dict(
-    paper_bgcolor="#FFFFFF",
-    plot_bgcolor="#F8F9FC",
-    font=dict(family="Inter", color="#4A5568", size=12),
-    margin=dict(t=24, b=48, l=48, r=24),
-)
+def _plot_layout(**kwargs):
+    base = dict(
+        paper_bgcolor="#FFFFFF",
+        plot_bgcolor="#F8F9FC",
+        font=dict(family="Inter", color="#4A5568", size=12),
+        margin=dict(t=24, b=48, l=48, r=24),
+    )
+    base.update(kwargs)
+    return base
 
 SAMPLE_CSV = """Ticker,Weight,AssetType
 RELIANCE.NS,15,Stock
@@ -443,12 +446,11 @@ if "result" in st.session_state:
                                   annotation_text=f"Portfolio β={pr.weighted_beta:.3f}",
                                   annotation_position="right",
                                   annotation_font_color="#3B5BDB")
-            fig_bar.update_layout(
-                **PLOT_BASE,
+            fig_bar.update_layout(_plot_layout(
                 xaxis=dict(tickangle=-30, gridcolor="#E2E8F0", title=""),
                 yaxis=dict(gridcolor="#E2E8F0", title="Beta (vs NIFTY 50)"),
                 height=420, margin=dict(t=24, b=60, l=48, r=130),
-            )
+            ))
             st.plotly_chart(fig_bar, use_container_width=True)
 
             st.markdown('<h3 style="font-size:16px;font-weight:600;color:#1A202C;margin:24px 0 4px">Risk vs Allocation — β by Portfolio Weight</h3>', unsafe_allow_html=True)
@@ -466,12 +468,11 @@ if "result" in st.session_state:
                                    f"Beta: {h.beta:.4f}<extra></extra>")
                 ))
             fig_sc.add_hline(y=1.0, line_dash="dash", line_color="#CBD5E0")
-            fig_sc.update_layout(
-                **PLOT_BASE,
+            fig_sc.update_layout(_plot_layout(
                 xaxis=dict(gridcolor="#E2E8F0", title="Portfolio Weight (%)"),
                 yaxis=dict(gridcolor="#E2E8F0", title="Beta (vs NIFTY 50)"),
                 height=420,
-            )
+            ))
             st.plotly_chart(fig_sc, use_container_width=True)
         else:
             st.warning("No valid beta values to visualize.")
@@ -501,12 +502,11 @@ if "result" in st.session_state:
                             annotation_text=f"Portfolio β = {pr.weighted_beta:.3f}",
                             annotation_position="top right",
                             annotation_font_color="#3B5BDB")
-            fig_c.update_layout(
-                **PLOT_BASE,
+            fig_c.update_layout(_plot_layout(
                 xaxis=dict(gridcolor="#E2E8F0", title="Beta Contribution"),
                 yaxis=dict(gridcolor="#E2E8F0", title=""),
                 height=max(300, len(contribs) * 40),
-            )
+            ))
             st.plotly_chart(fig_c, use_container_width=True)
 
             cdf = pd.DataFrame(contribs, columns=["Ticker", "β Contribution", "Weight %", "Beta", "Source"])
